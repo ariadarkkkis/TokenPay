@@ -55,5 +55,19 @@ namespace TokenPay.Extensions
 
             return $"Unknown Blockchain[{currency}]";
         }
+
+        public static string ToNetworkName(this string currency, List<EVMChain> chains)
+        {
+            if (currency == "TRX" || currency.EndsWith("TRC20")) return "TRC20";
+
+            var ChainNameEN = currency.Replace("EVM", "").Split("_", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).First();
+            var chain = chains.Where(x => x.ChainNameEN == ChainNameEN).FirstOrDefault();
+            if (chain != null)
+            {
+                return chain.ERC20Name;
+            }
+
+            return $"Unknown Blockchain[{currency}]";
+        }
     }
 }

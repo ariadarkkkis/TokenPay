@@ -8,6 +8,336 @@
 @using TokenPay.Models.EthModel;
 @model TokenPay.Domains.TokenOrders
 @inject List<EVMChain> chain
+
+<style>
+    body {
+        background: #000000;
+        background-image: url(../bg.jpg);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        color: #e4e6eb;
+    }
+    
+    .payment-container {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            inset 0 0 32px rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: none;
+        max-width: 500px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .payment-container::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 16px;
+        padding: 1px;
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.02)
+        );
+        -webkit-mask: 
+            linear-gradient(#fff 0 0) content-box, 
+            linear-gradient(#fff 0 0);
+        mask: 
+            linear-gradient(#fff 0 0) content-box, 
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    
+    .time {
+        font-family: 'JetBrains Mono', Consolas, Menlo, Courier;
+        color: #e4e6eb;
+    }
+
+    .address-container {
+        background: linear-gradient(145deg, #141922, #1a202b);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .address-scroll {
+        padding: 1rem;
+        font-family: 'JetBrains Mono', Consolas, Menlo, Courier;
+        color: #3b82f6;
+        background: #1e242e;
+        border-radius: 12px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .address-value {
+        font-size: 1.1rem;
+        word-break: break-all;
+        line-height: 1.5;
+        flex: 1;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .copy-btn {
+        flex-shrink: 0;
+    }
+
+    .amount-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #1e242e;
+        border-radius: 12px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        margin-top: 1rem;
+    }
+
+    .amount-display {
+        color: #ffffff;
+        font-family: 'JetBrains Mono', Consolas, Menlo, Courier;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .custom-input {
+        background-color: #1e242e !important;
+        border: 1px solid rgba(59, 130, 246, 0.2) !important;
+        color: #e4e6eb !important;
+        border-radius: 8px !important;
+    }
+    
+    .custom-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+    }
+    
+    .custom-btn {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .custom-btn:hover {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        transform: translateY(-1px);
+    }
+    
+    .qr-container {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: block;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .qr-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        max-width: 380px;
+        aspect-ratio: 1/1;
+        object-fit: contain;
+    }
+    
+    .warning-text {
+        color: #5a95f4;
+    }
+
+    .warning-container {
+        background: linear-gradient(145deg, #1e242e, #23292f);
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .address-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        margin-top: 1rem;
+        background: #1e242e;
+        border-radius: 12px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .timer-container {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+        font-family: 'JetBrains Mono', Consolas, Menlo, Courier;
+    }
+
+    .timer-block {
+        background: linear-gradient(145deg, #1e242e, #23292f);
+        padding: 1rem;
+        border-radius: 12px;
+        min-width: 70px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .timer-number {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #ffffff;
+        margin-bottom: 0.2rem;
+    }
+
+    .timer-label {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1rem;
+        background: linear-gradient(145deg, #1e242e, #23292f);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-top: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .info-item {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    @@media (min-width: 768px) {
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+
+    .info-item .info-label {
+        color: #94a3b8;
+    }
+
+    .info-item .info-value {
+        color: #ffffff;
+        font-weight: 600;
+        word-break: break-all;
+    }
+
+    .info-label {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        text-align: left;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+    }
+
+    .blockchain-warning {
+        background: linear-gradient(145deg, #141922, #1a202b);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .blockchain-info {
+        margin-bottom: 1rem;
+    }
+
+    .blockchain-info:last-child {
+        margin-bottom: 0;
+    }
+
+    .blockchain-label {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+    }
+
+    .blockchain-value {
+        padding: 1rem;
+        background: #1e242e;
+        border-radius: 12px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .address-section, .amount-section {
+        margin-bottom: 1rem;
+    }
+
+    .address-section:last-child, .amount-section:last-child {
+        margin-bottom: 0;
+    }
+
+    @@media (max-width: 400px) {
+        .blockchain-warning {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            gap: 0.75rem;
+        }
+        
+        .blockchain-info {
+            align-items: center;
+            font-size: 0.85rem;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .timer-container {
+            padding: 1rem;
+        }
+        
+        .timer-block {
+            min-width: 60px;
+            padding: 0.75rem;
+        }
+
+        .timer-label {
+            font-size: 0.6rem;
+        }
+        
+        .timer-number {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
 @if (Model == null)
 {
     <div class="row align-items-center h-100">
@@ -15,66 +345,110 @@
             <h1 class="display-4">Order does not exist!</h1>
         </div>
     </div>
-
 }
 else
 {
-    <style>
-        .time {
-            font-family: Consolas,Menlo,Courier;
-        }
+    <div class="container py-5">
+        <div class="payment-container">
+            <div class="text-center">
+                <div class="warning-container">
+                    <div class="warning-text fw-bold">⚠️ Please pay in time to avoid losing assets or payment failures!</div>
+                </div>
+                <!--h4 class="display-6 mb-4">You are paying <span class="warning-text">@Model.Currency.ToCurrency(chain, true)</span> on <span class="warning-text">@Model.Currency.ToBlockchainEnglishName(chain)</span> blockchain</h4-->
+                <h4 class="display-6 mb-4" style="color: #94a3b8;">Remaining Time</h4>
 
-        .address {
-        @if (@Model.ToAddress.StartsWith("T"))
-        {
-            @Html.Raw("font-size:14px;")
-        }
-        else
-        {
-            @Html.Raw("font-size:12px;")
-        }
-        }
-    </style>
-    <div class="text-center pt-2">
-        <h4 class="display-6">You are paying <span class="text-danger">@Model.Currency.ToCurrency(chain, true)</span> for <span class="text-danger">@Model.Currency.ToBlockchainEnglishName(chain)</span> </h4>
+                <div class="timer-container invisible time">
+                    <div class="timer-block">
+                        <div class="timer-number" id="hour_show">00</div>
+                        <div class="timer-label">Hours</div>
+                    </div>
+                    <div class="timer-block">
+                        <div class="timer-number" id="minute_show">00</div>
+                        <div class="timer-label">Minutes</div>
+                    </div>
+                    <div class="timer-block">
+                        <div class="timer-number" id="second_show">00</div>
+                        <div class="timer-label">Seconds</div>
+                    </div>
+                </div>
 
-        <div class="d-flex mb-2">
-            <div class="input-group m-auto" style="width:410px;">
-                <input class="form-control form-control-sm" type="text" id="Token" value="@Model.ToAddress" readonly>
-                <button class="btn btn-primary btn-sm" data-clipboard-target="#Token">Copy</button>
+                <div class="mb-4">
+                    <div class="qr-container">
+                        <img src="data:image/png;base64,@ViewData["QrCode"]" alt="address">
+                    </div>
+                </div>
+
+                <div class="blockchain-warning">
+                    <div class="warning-container">
+                        <div class="warning-text fw-bold">⚠️ Please double check the blockchain and coin to avoid losing assets or payment failures!</div>
+                    </div>
+                    <div class="blockchain-info">
+                        <div class="blockchain-label">Blockchain</div>
+                        <div class="blockchain-value">@Model.Currency.ToBlockchainEnglishName(chain) (@Model.Currency.ToNetworkName(chain))</div>
+                    </div>
+                    <div class="blockchain-info">
+                        <div class="blockchain-label">Coin</div>
+                        <div class="blockchain-value">@Model.Currency.ToCurrency(chain)</div>
+                    </div>
+                </div>
+
+                <div class="address-container">
+                    <div class="warning-container" style="margin: 0; margin-bottom: 1.5rem;">
+                        <div class="warning-text fw-bold">⚠️ Please send the exact amount to the address below, otherwise the payment will fail!</div>
+                    </div>
+                    <div class="address-section">
+                        <div class="info-label">Address</div>
+                        <div class="address-scroll">
+                            <div class="address-value" id="Token">@Model.ToAddress</div>
+                            <button class="btn custom-btn btn-sm copy-btn" data-clipboard-target="#Token">Copy</button>
+                        </div>
+                    </div>
+                    <div class="amount-section">
+                        <div class="info-label">Amount</div>
+                        <div class="amount-container">
+                            <div class="amount-display">
+                                @Model.Amount @Model.Currency.ToCurrency(chain)
+                            </div>
+                            <button class="btn custom-btn btn-sm" data-clipboard-text="@Model.Amount">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Order No</span>
+                        <span class="info-value">@Model.OutOrderId</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Expiration</span>
+                        <span class="info-value" id="expiration-time" data-utc="@ExpireTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")"></span>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="mb-2 fw-bold display-6 invisible time">
-            Time left：<span class="text-danger"><span id="day_show"></span><span id="hour_show"></span><span id="minute_show"></span><span id="second_show"></span></span>
-        </div>
-        <div class="text-danger fw-bold mb-2">Please double check the blockchain and currency to avoid losing assets or payment failures ! ! !</div>
-        <div class="mb-2">
-            <div class="text-danger fw-bold" style="position:relative;bottom:-6px;height:0;">Blockchain：@Model.Currency.ToBlockchainEnglishName(chain) Currency：@Model.Currency.ToCurrency(chain)</div>
-            <img src="data:image/png;base64,@ViewData["QrCode"]" class="border border-gray-300" alt="address">
-            <div class="text-danger fw-semibold address" style="position:relative;top:-24px;height:0;">@Model.ToAddress</div>
-        </div>
-        <div class="text-start m-auto" style="width:300px;">
-            <div class="mb-2 fw-bold">
-                Amount：<span class="text-danger">@Model.Amount @Model.Currency.ToCurrency(chain)</span><button class="btn btn-primary btn-sm ms-2" data-clipboard-text="@Model.Amount">Copy</button>
-            </div>
-            <div class="mb-2">
-                Order No：<span class="text-danger">@Model.OutOrderId</span>
-            </div>
-            <div class="mb-2">
-                Expiration：<span class="text-danger">@ExpireTime.ToString("yyyy-MM-dd HH:mm:ss \"GMT\"zzz")</span>
-            </div>
-            <!--div class="mt-4 text-start">
-                <div>You can buy blockchain currency at</div>
-                <div>1. Buy <span class="text-danger">@Model.Currency.ToCurrency(chain)</span> on <a href="https://www.okx.com/buy-crypto#sourceBase=@Model.Currency.ToCurrency(chain)" target="_blank">OKX</a></div>
-                <div>2. Buy <span class="text-danger">@Model.Currency.ToCurrency(chain)</span> on<a href="https://p2p.binance.com/express/buy/@Model.Currency.ToCurrency(chain)" target="_blank">Binance</a></div>
-            </div-->
         </div>
     </div>
 
     @section Scripts {
-    <script>
-        let Time;
-        var EndTime = new Date('@ExpireTime.ToUniversalTime().ToString("yyyy/MM/dd HH:mm:ss")');
+        <script>
+            let Time;
+            var EndTime = new Date('@ExpireTime.ToUniversalTime().ToString("yyyy/MM/dd HH:mm:ss")');
+            
+            function formatDateTime(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                
+                return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+            }
+
+            // Format expiration time
+            const expirationElement = document.getElementById('expiration-time');
+            const utcDate = new Date(expirationElement.dataset.utc);
+            expirationElement.textContent = formatDateTime(utcDate);
+
             function timer() {
                 window.setInterval(function () {
                     var intDiff = (EndTime - new Date(new Date().toISOString().replace('T', ' ').replace('Z', ''))) / 1000
@@ -86,19 +460,16 @@ else
                         second = 0;
                     if (intDiff > 0) {
                         day = Math.floor(intDiff / (60 * 60 * 24));
-                        hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
-                        minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
-                        second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+                        hour = Math.floor(intDiff / (60 * 60)) + (day * 24);
+                        minute = Math.floor(intDiff / 60) - (hour * 60);
+                        second = Math.floor(intDiff) - (hour * 60 * 60) - (minute * 60);
                     }
+                    if (hour <= 9) hour = '0' + hour;
                     if (minute <= 9) minute = '0' + minute;
                     if (second <= 9) second = '0' + second;
-                    if (day)
-                        $('#day_show').html(day + " Days ");
-                    if (hour)
-                        $('#hour_show').html('<s id="h"></s>' + hour + ' Hours ');
-                    if (minute)
-                        $('#minute_show').html('<s></s>' + minute + ' Minutes ');
-                    $('#second_show').html('<s></s>' + second + ' Seconds ');
+                    $('#hour_show').html(hour);
+                    $('#minute_show').html(minute);
+                    $('#second_show').html(second);
                     intDiff--;
                 }, 1000);
             }
