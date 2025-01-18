@@ -23,7 +23,7 @@ namespace TokenPay.BgServices
             IHostEnvironment env,
             Channel<TokenOrders> channel,
             List<EVMChain> Chains,
-            IFreeSql freeSql) : base("EVM基本币订单检测", TimeSpan.FromSeconds(15), logger)
+            IFreeSql freeSql) : base("EVM basic currency order detection", TimeSpan.FromSeconds(15), logger)
         {
             this._configuration = configuration;
             this._env = env;
@@ -63,7 +63,7 @@ namespace TokenPay.BgServices
                             continue;
                         }
 
-                        #region 查询最新区块数
+                        #region Query the latest block number
                         var queryBlockNumber = new Dictionary<string, object>
                         {
                             { "module", "proxy" },
@@ -80,7 +80,7 @@ namespace TokenPay.BgServices
                         var NowBlockNumber = Convert.ToInt32(resultBlockNumber.Result, 16);
                         #endregion
 
-                        #region 检查订单
+                        #region Check Order
                         Func<EthTransaction, Task> CheckOrder = async (EthTransaction item) =>
                         {
                             var RealAmount = item.RealAmount(chain.Decimals);
@@ -124,7 +124,7 @@ namespace TokenPay.BgServices
                         };
                         #endregion
 
-                        #region 外部交易
+                        #region External Transactions
                         var query = new Dictionary<string, object>
                         {
                             { "module", "account" },
@@ -169,7 +169,7 @@ namespace TokenPay.BgServices
                         }
                         #endregion
 
-                        #region 内部交易
+                        #region Insider Trading
                         var queryInternal = new Dictionary<string, object>
                         {
                             { "module", "account" },
@@ -215,7 +215,7 @@ namespace TokenPay.BgServices
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "{coin}查询交易记录出错！", Currency);
+                    _logger.LogError(e, "{coin} Error in querying transaction records!", Currency);
                 }
             }
         }

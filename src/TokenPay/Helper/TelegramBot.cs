@@ -22,7 +22,7 @@ namespace TokenPay.Helper
         {
             if (string.IsNullOrEmpty(_botToken) || _userId == 0)
             {
-                Log.Logger.Information("未配置机器人Token！");
+                Log.Logger.Information("Telegram bot token not configured!");
                 return null;
             }
             var ApiHost = TelegramApiHost ?? BaseTelegramApiHost;
@@ -32,16 +32,16 @@ namespace TokenPay.Helper
                     .AppendPathSegment($"bot{_botToken}/getMe")
                     .WithTimeout(10);
             var result = await request.GetJsonAsync<TelegramResult<TelegramBotInfo>>();
-            Log.Logger.Information("机器人启动成功！我是{@result}。", result.Result.FirstName);
+            Log.Logger.Information("The robot was successfully started! I am {@result}。", result.Result.FirstName);
             BotInfo = result.Result;
-            await SendTextMessageAsync("你好呀~我是TokenPay通知机器人！");
+            await SendTextMessageAsync("Hello, I am the TokenPay notification bot!");
             return result;
         }
         public async Task<TelegramResult<SendMessageResult>?> SendTextMessageAsync(string Message, string? TelegramApiHost = null, CancellationToken? cancellationToken = null)
         {
             if (string.IsNullOrEmpty(_botToken) || _userId == 0)
             {
-                Log.Logger.Information("未配置机器人Token！");
+                Log.Logger.Information("Telegram bot token not configured!");
                 return null;
             }
             var ApiHost = TelegramApiHost ?? BaseTelegramApiHost;
@@ -60,12 +60,12 @@ namespace TokenPay.Helper
             try
             {
                 var result = await request.GetJsonAsync<TelegramResult<SendMessageResult>>(cancellationToken: cancellationToken ?? default);
-                Log.Logger.Information("机器人消息发送结果：{result}", result.Ok);
+                Log.Logger.Information("Bot message sending result: {result}", result.Ok);
                 return result;
             }
             catch (Exception e)
             {
-                Log.Logger.Error(e, "机器人发送消息失败！");
+                Log.Logger.Error(e, "Bot failed to send message!");
             }
             return null;
         }

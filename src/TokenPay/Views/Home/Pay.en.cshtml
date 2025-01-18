@@ -63,11 +63,11 @@ else
             <div class="mb-2">
                 Expiration：<span class="text-danger">@ExpireTime.ToString("yyyy-MM-dd HH:mm:ss \"GMT\"zzz")</span>
             </div>
-            <div class="mt-4 text-start">
+            <!--div class="mt-4 text-start">
                 <div>You can buy blockchain currency at</div>
                 <div>1. Buy <span class="text-danger">@Model.Currency.ToCurrency(chain)</span> on <a href="https://www.okx.com/buy-crypto#sourceBase=@Model.Currency.ToCurrency(chain)" target="_blank">OKX</a></div>
                 <div>2. Buy <span class="text-danger">@Model.Currency.ToCurrency(chain)</span> on<a href="https://p2p.binance.com/express/buy/@Model.Currency.ToCurrency(chain)" target="_blank">Binance</a></div>
-            </div>
+            </div-->
         </div>
     </div>
 
@@ -111,14 +111,14 @@ else
                 $.get("/Check/@(Model?.Id)")
                     .then(x => {
                         if (x === 'Pending') {
-                            console.log('待支付')
+                            console.log('Pending')
                         } else if (x === 'Expired') {
                             clearInterval(Time)
-                            console.log('订单过期')
+                            console.log('Expired')
                             location.reload();
                         } else if (x === 'Paid') {
                             clearInterval(Time)
-                            console.log('已支付')
+                            console.log('Paid')
                             setTimeout(() => {
                                 if (RedirectUrl) {
                                     location = RedirectUrl

@@ -33,11 +33,11 @@ namespace TokenPay.Helper
             client.BeforeCall(c =>
             {
                 c.Request.WithHeader("Lang", "zh-CN");
-                _logger.LogInformation("发起请求\nURL：{url}\n参数：{body}", c.Request.Url, c.RequestBody);
+                _logger.LogInformation("Initiate request\nURL: {url}\nParameters: {body}", c.Request.Url, c.RequestBody);
             });
             client.AfterCall(async c =>
             {
-                _logger.LogInformation("收到响应\nURL：{url}\n响应：{@body}", c.Request.Url, c.Response != null ? await c.Response.GetStringAsync() : null);
+                _logger.LogInformation("Received response\nURL: {url}\nResponse: {@body}", c.Request.Url, c.Response != null ? await c.Response.GetStringAsync() : null);
             });
         }
         /// <summary>
@@ -283,23 +283,23 @@ namespace TokenPay.Helper
     }
     public enum FeeeOrderStatus
     {
-        未支付 = 1,
-        已关闭支付 = 2,
-        已支付待验证 = 3,
-        已支付 = 4,
-        已质押待验证 = 5,
-        已质押 = 6,
-        质押失败 = 7,
-        已解押待验证 = 8,
-        已解押 = 9,
-        解押失败 = 1,
-        取消待处理 = 11,
-        已取消 = 12,
-        待退款 = 13,
-        已退款 = 14,
-        质押进行中 = 15,
-        暂时锁定 = 16,
-        推迟回收 = 17,
+        NotPaid = 1,
+        Closed = 2,
+        PaidPendingVerification = 3,
+        Paid = 4,
+        SubmittedWaitingForConfirmation = 5,
+        Submitted = 6,
+        SubmissionFailed = 7,
+        ReleasedAwaitingVerification = 8,
+        Released = 9,
+        UnstakingFailed = 1,
+        CancelPending = 11,
+        Cancelled = 12,
+        PendingRefund = 13,
+        Refunded = 14,
+        StakingInProgress = 15,
+        TemporarilyLocked = 16,
+        PostponingRecycling = 17,
     }
 
     public class OrderPriceData

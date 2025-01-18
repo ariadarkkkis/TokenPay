@@ -10,7 +10,7 @@ namespace TokenPay.BgServices
 
         public OrderExpiredService(ILogger<OrderExpiredService> logger,
             IConfiguration configuration,
-            IFreeSql freeSql) : base("订单过期", TimeSpan.FromSeconds(10), logger)
+            IFreeSql freeSql) : base("Order Expired", TimeSpan.FromSeconds(10), logger)
         {
             this._configuration = configuration;
             this.freeSql = freeSql;
@@ -25,7 +25,7 @@ namespace TokenPay.BgServices
             var ExpiredOrders = await _repository.Where(x => x.CreateTime < ExpireDateTime && x.Status == OrderStatus.Pending).ToListAsync();
             foreach (var order in ExpiredOrders)
             {
-                _logger.LogInformation("订单[{c}]过期了！", order.Id);
+                _logger.LogInformation("Order [{c}] has expired!", order.Id);
                 order.Status = OrderStatus.Expired;
                 await _repository.UpdateAsync(order);
             }

@@ -33,7 +33,7 @@ namespace TokenPay.Controllers
             {
                 "TRX" => _configuration.GetValue("Decimals:TRX", 2),
                 "EVM_ETH" => _configuration.GetValue("Decimals:ETH", 5),
-                _ => _configuration.GetValue($"Decimals:{currency}", 4)
+                _ => _configuration.GetValue($"Decimals:{currency}", 5)
             };
 
             return decimals;
@@ -136,7 +136,7 @@ namespace TokenPay.Controllers
                 {
                     return Json(new ReturnData
                     {
-                        Message = "签名验证失败！"
+                        Message = "Signature verification failed!"
                     });
                 }
             }
@@ -145,13 +145,13 @@ namespace TokenPay.Controllers
             {
                 return Json(new ReturnData
                 {
-                    Message = "订单不存在！"
+                    Message = "The order does not exist!"
                 });
             }
             return Json(new ReturnData<TokenOrders>
             {
                 Success = true,
-                Message = "订单信息获取成功！",
+                Message = "Order information obtained successfully!",
                 Data = order,
             });
         }
@@ -216,7 +216,7 @@ namespace TokenPay.Controllers
                 {
                     return Json(new ReturnData
                     {
-                        Message = "签名验证失败！"
+                        Message = "Signature verification failed!"
                     });
                 }
             }
@@ -224,14 +224,14 @@ namespace TokenPay.Controllers
             {
                 return Json(new ReturnData
                 {
-                    Message = $"不支持的币种【{model.Currency}】！\n当前支持的币种参数有：{string.Join(", ", GetActiveCurrency(_chains))}"
+                    Message = $"Unsupported currency [{model.Currency}]!\nCurrently supported currency parameters are:{string.Join(", ", GetActiveCurrency(_chains))}"
                 });
             }
             if (model.ActualAmount <= 0)
             {
                 return Json(new ReturnData
                 {
-                    Message = "金额有误！"
+                    Message = "The amount is wrong!"
                 });
             }
             //订单号已存在
@@ -243,7 +243,7 @@ namespace TokenPay.Controllers
                 return Json(new ReturnData<string>
                 {
                     Success = true,
-                    Message = "订单已存在，查询旧订单！",
+                    Message = "The order already exists, check the old order!",
                     Data = Host + Url.Action(nameof(Pay), new { Id = hasOrder.Id }),
                     Info = ToPayDic(hasOrder)
                 });
@@ -286,14 +286,14 @@ namespace TokenPay.Controllers
             {
                 return Json(new ReturnData
                 {
-                    Message = "此订单金额过低！"
+                    Message = "This order amount is too low!"
                 });
             }
             await _repository.InsertAsync(order);
             return Json(new ReturnData<string>
             {
                 Success = true,
-                Message = "创建订单成功！",
+                Message = "Order created successfully!",
                 Data = Host + Url.Action(nameof(Pay), new { Id = order.Id }),
                 Info = ToPayDic(order)
             });
@@ -363,7 +363,7 @@ namespace TokenPay.Controllers
             }
             if (rate <= 0)
             {
-                throw new TokenPayException("汇率有误！");
+                throw new TokenPayException("The exchange rate is wrong!");
             }
             var Amount = (model.ActualAmount / rate).ToRound(GetDecimals(model.Currency)); //因为每个用户一个独立支付地址，所以此处金额计算逻辑与静态地址不同
             return (UseTokenAdress, Amount);
@@ -376,7 +376,7 @@ namespace TokenPay.Controllers
         {
             if (string.IsNullOrEmpty(OrderUserKey))
             {
-                throw new TokenPayException("动态地址需传递用户标识！");
+                throw new TokenPayException("Dynamic addresses require passing user ID!");
             }
             var BaseCurrency = TokenCurrency.TRX;
             // 币种以EVM开头判定为EVM
@@ -443,7 +443,7 @@ namespace TokenPay.Controllers
             }
             if (CurrentAdress.Length == 0)
             {
-                throw new TokenPayException("未配置收款地址！");
+                throw new TokenPayException("The payment address is not configured!");
             }
             var rate = GetRate(model.Currency);
             if (rate <= 0)
@@ -453,7 +453,7 @@ namespace TokenPay.Controllers
             }
             if (rate <= 0)
             {
-                throw new TokenPayException("汇率有误！");
+                throw new TokenPayException("The exchange rate is wrong!");
             }
             var Amount = (model.ActualAmount / rate).ToRound(GetDecimals(model.Currency));
             //随机排序所有收款地址
@@ -510,7 +510,7 @@ namespace TokenPay.Controllers
             }
             if (string.IsNullOrEmpty(UseTokenAdress))
             {
-                throw new TokenPayException("无可用收款地址！");
+                throw new TokenPayException("No available payment address!");
             }
             return (UseTokenAdress, Amount);
         }
@@ -521,7 +521,7 @@ namespace TokenPay.Controllers
             var item = await _tokenRepository.Where(x => x.Address == address && x.Currency == TokenCurrency.TRX).FirstAsync();
             if (item == null)
             {
-                _logger.LogWarning("检查的地址[{address}]不存在！", address);
+                _logger.LogWarning("The address [{address}] being checked does not exist!", address);
                 return Content("ok");
             }
             item.Value = await QueryTronAction.GetTRXAsync(address);

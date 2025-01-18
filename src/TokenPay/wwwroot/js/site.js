@@ -4,7 +4,7 @@
     var clipboard = new ClipboardJS('.btn');
 
     clipboard.on('success', function (e) {
-        alert('复制成功！\n复制内容：' + e.text)
+        alert('Copy successful! \nCopied content:' + e.text)
     });
 
     clipboard.on('error', function (e) {

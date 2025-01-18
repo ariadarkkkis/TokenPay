@@ -30,11 +30,11 @@ namespace TokenPay.BgServices
                     }
                     catch (Flurl.Http.FlurlHttpException ex) when (ex.StatusCode == 401 || ex.StatusCode == 403)
                     {
-                        _logger.LogError(ex, "定时任务[{jobName}]执行Api请求出现错误，返回：{code}，通常为Api鉴权出现问题或者调用次数超出限制", jobName, ex.StatusCode);
+                        _logger.LogError(ex, "An error occurred when executing the API request for the scheduled task [{jobName}], and the result is: {code}. This is usually caused by an API authentication problem or the number of calls exceeding the limit.", jobName, ex.StatusCode);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"定时任务[{jobName}]执行出现错误");
+                        _logger.LogError(ex, $"An error occurred while executing the scheduled task [{jobName}]");
                     }
                 } while (!stoppingToken.IsCancellationRequested && await _timer.WaitForNextTickAsync(stoppingToken));
             }

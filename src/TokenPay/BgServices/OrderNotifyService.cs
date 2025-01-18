@@ -14,7 +14,7 @@ namespace TokenPay.BgServices
 
         public OrderNotifyService(ILogger<OrderNotifyService> logger,
             IConfiguration configuration,
-            IFreeSql freeSql) : base("订单通知", TimeSpan.FromSeconds(1), logger)
+            IFreeSql freeSql) : base("Order Notification", TimeSpan.FromSeconds(1), logger)
         {
             this._configuration = configuration;
             this.freeSql = freeSql;
@@ -23,13 +23,13 @@ namespace TokenPay.BgServices
             client.BeforeCall(c =>
             {
                 c.Request.WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 TokenPay/1.0");
-                _logger.LogInformation("发起请求\nURL：{url}\n参数：{body}", c.Request.Url, c.RequestBody);
+                _logger.LogInformation("Initiate request\nURL: {url}\nParameters: {body}", c.Request.Url, c.RequestBody);
             });
             client.AfterCall(async c =>
             {
                 if (c.Response != null)
                 {
-                    _logger.LogInformation("收到响应\nURL：{url}\n响应：{@body}", c.Request.Url, await c.Response.GetStringAsync());
+                    _logger.LogInformation("Received response\nURL: {url}\nResponse: {@body}", c.Request.Url, await c.Response.GetStringAsync());
                 }
             });
         }
@@ -47,7 +47,7 @@ namespace TokenPay.BgServices
                 .ToListAsync();
             foreach (var order in Orders)
             {
-                _logger.LogInformation("开始异步通知订单: {c}", order.Id);
+                _logger.LogInformation("Start asynchronous notification of orders: {c}", order.Id);
                 order.CallbackNum++;
                 order.LastNotifyTime = DateTime.Now;
                 await _repository.UpdateAsync(order);
@@ -57,7 +57,7 @@ namespace TokenPay.BgServices
                     order.CallbackConfirm = true;
                     await _repository.UpdateAsync(order);
                 }
-                _logger.LogInformation("订单: {c}，通知结果：{d}", order.Id, result ? "成功" : "失败");
+                _logger.LogInformation("Order: {c}, Notification result: {d}", order.Id, result ? "Sucess" : "Fail");
             }
         }
 
@@ -78,17 +78,17 @@ namespace TokenPay.BgServices
                     var message = await result.GetStringAsync();
                     if (result.StatusCode == 200 && message == "ok")
                     {
-                        _logger.LogInformation("订单异步通知成功！\n{msg}", message);
+                        _logger.LogInformation("Order asynchronous notification successful!\n{msg}", message);
                         return true;
                     }
                     else
                     {
-                        _logger.LogInformation("订单异步通知失败：{msg}", message);
+                        _logger.LogInformation("Order asynchronous notification failed: {msg}", message);
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.LogInformation(e, "订单异步通知失败：{msg}", e.Message);
+                    _logger.LogInformation(e, "Order asynchronous notification failed: {msg}", e.Message);
                 }
             }
             return false;

@@ -20,7 +20,7 @@ namespace TokenPay.BgServices
             TelegramBot bot,
             List<EVMChain> chain,
             IConfiguration configuration,
-            ILogger<OrderPaySuccessService> logger) : base("发送订单通知", logger)
+            ILogger<OrderPaySuccessService> logger) : base("Send order notification", logger)
         {
             this._channel = channel;
             this._env = env;
@@ -41,7 +41,7 @@ namespace TokenPay.BgServices
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError(e, "发送新订单通知失败！");
+                        _logger.LogError(e, "Failed to send new order notification!");
                     }
                 }
             }
@@ -56,27 +56,27 @@ namespace TokenPay.BgServices
                 order.Currency = order.Currency.Replace(item, "");
             }
             var curreny = order.Currency.Replace("TRC20", "").Split("_", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Last();
-            var message = @$"<b>您有新订单！({order.ActualAmount} {BaseCurrency})</b>
+            var message = @$"<b>You have a new order! ({order.ActualAmount} {BaseCurrency})</b>
 
-订单编号：<code>{order.OutOrderId}</code>
-原始金额：<b>{order.ActualAmount} {BaseCurrency}</b>
-订单金额：<b>{order.Amount} {curreny}</b>
-实付金额：<b>{order.PayAmount} {curreny}</b>{(order.IsDynamicAmount ? "(动态金额订单)" : "")}
-付款地址：<code>{order.FromAddress}</code>
-收款地址：<code>{order.ToAddress}</code>
-创建时间：<b>{order.CreateTime:yyyy-MM-dd HH:mm:ss}</b>
-支付时间：<b>{order.PayTime:yyyy-MM-dd HH:mm:ss}</b>
-交易哈希：<code>{order.BlockTransactionId}</code>";
+Order Number: <code>{order.OutOrderId}</code>
+Actual amount:<b>{order.ActualAmount} {BaseCurrency}</b>
+Order amount: <b>{order.Amount} {curreny}</b>
+Paid amount: <b>{order.PayAmount} {curreny}</b>{(order.IsDynamicAmount ? "(Dynamic amount order)" : "")}
+From address: <code>{order.FromAddress}</code>
+To address: <code>{order.ToAddress}</code>
+Created at: <b>{order.CreateTime:yyyy-MM-dd HH:mm:ss}</b>
+Paid at: <b>{order.PayTime:yyyy-MM-dd HH:mm:ss}</b>
+Transaction Hash: <code>{order.BlockTransactionId}</code>";
 
             if (order.Currency.Contains("TRX") || order.Currency.Contains("TRC20"))
             {
                 if (_env.IsProduction())
                 {
-                    message += @$"  <b><a href=""https://tronscan.org/#/transaction/{order.BlockTransactionId}?lang=zh"">查看交易</a></b>";
+                    message += @$"  <b><a href=""https://tronscan.org/#/transaction/{order.BlockTransactionId}?lang=en"">View transaction</a></b>";
                 }
                 else
                 {
-                    message += @$"  <b><a href=""https://shasta.tronscan.org/#/transaction/{order.BlockTransactionId}?lang=zh"">查看交易</a></b>";
+                    message += @$"  <b><a href=""https://shasta.tronscan.org/#/transaction/{order.BlockTransactionId}?lang=en"">View transaction</a></b>";
                 }
             }
             else if (order.Currency.StartsWith("EVM"))
@@ -86,7 +86,7 @@ namespace TokenPay.BgServices
                     if (order.Currency.StartsWith($"EVM_{chain.ChainNameEN}"))
                     {
                         if (!string.IsNullOrEmpty(chain.ScanHost))
-                            message += @$"  <b><a href=""{chain.ScanHost}/tx/{order.BlockTransactionId}"">查看交易</a></b>";
+                            message += @$"  <b><a href=""{chain.ScanHost}/tx/{order.BlockTransactionId}"">View transaction</a></b>";
                         break;
                     }
                 }

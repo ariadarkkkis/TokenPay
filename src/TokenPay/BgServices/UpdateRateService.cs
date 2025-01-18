@@ -13,7 +13,7 @@ namespace TokenPay.BgServices
     public class UpdateRateService : BaseScheduledService
     {
         const string baseUrl = "https://www.okx.com";
-        const string User_Agent = "TokenPay/1.0 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36";
+        const string User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36 TokenPay/1.0";
         private readonly IConfiguration _configuration;
         private readonly List<EVMChain> _chain;
         private readonly IFreeSql freeSql;
@@ -22,7 +22,7 @@ namespace TokenPay.BgServices
             IConfiguration configuration,
             List<EVMChain> chain,
             IFreeSql freeSql,
-            ILogger<UpdateRateService> logger) : base("更新汇率", TimeSpan.FromSeconds(configuration.GetValue("UpdateRateTime", 300)), logger)
+            ILogger<UpdateRateService> logger) : base("Update exchange rate", TimeSpan.FromSeconds(configuration.GetValue("UpdateRateTime", 300)), logger)
         {
             this._configuration = configuration;
             this._chain = chain;
@@ -65,9 +65,9 @@ namespace TokenPay.BgServices
             baseCurrencyList = baseCurrencyList.Distinct().ToList();
             if (baseCurrencyList.Count == 0)
             {
-                _logger.LogInformation("没有需要更新汇率的币种");
+                _logger.LogInformation("There is no currency that needs to update the exchange rate");
             }
-            _logger.LogInformation("------------------{tips}------------------", "开始更新汇率");
+            _logger.LogInformation("------------------{tips}------------------", "Start updating exchange rates");
             var _repository = freeSql.GetRepository<TokenRate>();
             var list = new List<TokenRate>();
 
@@ -100,12 +100,12 @@ namespace TokenPay.BgServices
                     }
                     else
                     {
-                        _logger.LogWarning("{item} 汇率获取失败！错误信息：{msg}", item, result.msg ?? result.error_message);
+                        _logger.LogWarning("{item} Failed to obtain the exchange rate! Error message: {msg}", item, result.msg ?? result.error_message);
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.LogWarning("{item} 汇率获取失败！错误信息：{msg}", item, e?.InnerException?.Message + "; " + e?.Message);
+                    _logger.LogWarning("{item} Failed to obtain the exchange rate! Error message: {msg}", item, e?.InnerException?.Message + "; " + e?.Message);
                 }
             }
 
@@ -118,10 +118,10 @@ namespace TokenPay.BgServices
                 {
                     item.Rate += RateMove;
                 }
-                _logger.LogInformation("更新汇率，{a}=>{b} = {c}", item.Currency, item.FiatCurrency, $"{item.Rate}{(RateMove != 0 ? $" ({RateMove:+0.##;-0.##;0})" : "")}");
+                _logger.LogInformation("Update exchange rates, {a}=>{b} = {c}", item.Currency, item.FiatCurrency, $"{item.Rate}{(RateMove != 0 ? $" ({RateMove:+0.##;-0.##;0})" : "")}");
                 await _repository.InsertOrUpdateAsync(item);
             }
-            _logger.LogInformation("------------------{tips}------------------", "结束更新汇率");
+            _logger.LogInformation("------------------{tips}------------------", "End updating exchange rate");
         }
     }
 

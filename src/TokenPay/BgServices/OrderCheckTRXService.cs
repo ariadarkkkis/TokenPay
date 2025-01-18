@@ -22,7 +22,7 @@ namespace TokenPay.BgServices
             IConfiguration configuration,
             IHostEnvironment env,
             Channel<TokenOrders> channel,
-            IFreeSql freeSql) : base("TRX订单检测", TimeSpan.FromSeconds(3), logger)
+            IFreeSql freeSql) : base("TRX Order Detection", TimeSpan.FromSeconds(3), logger)
         {
             this._configuration = configuration;
             this._env = env;

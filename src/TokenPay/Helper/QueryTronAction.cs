@@ -64,7 +64,7 @@ namespace TokenPay.Helper
 
             if (result.Result.Result)
             {
-                Log.Logger.Information("检查余额：{address}", Address);
+                Log.Logger.Information("Check your balance: {address}", Address);
                 //Log.Logger.Information("金额：{@result}", result);
                 var amountAbi = result.ConstantResult.FirstOrDefault();
                 if (!string.IsNullOrEmpty(amountAbi))
@@ -153,7 +153,7 @@ namespace TokenPay.Helper
                             value = result2.Txid,
                             visible = true
                         }).ReceiveJson<Models.Transaction>();
-                        Log.Logger.Information("等待交易数据上链，TXID={a}", result2.Txid);
+                        Log.Logger.Information("Waiting for transaction data to be uploaded to the chain, TXID={a}", result2.Txid);
                         await Task.Delay(1000);
                     }
                 }
@@ -164,7 +164,7 @@ namespace TokenPay.Helper
                 }
             }
 
-            return (result2.Result, result2.Result ? result2.Txid : "广播失败！");
+            return (result2.Result, result2.Result ? result2.Txid : "Broadcast failed!");
         }
         /// <summary>
         /// 转USDT
@@ -251,7 +251,7 @@ namespace TokenPay.Helper
                             value = result2.Txid,
                             visible = true
                         }).ReceiveJson<Models.Transaction>();
-                        Log.Logger.Information("等待交易数据上链，TXID={a}", result2.Txid);
+                        Log.Logger.Information("Waiting for transaction data to be uploaded to the chain, TXID={a}", result2.Txid);
                         await Task.Delay(1000);
                     }
                 }
@@ -262,7 +262,7 @@ namespace TokenPay.Helper
                 }
             }
 
-            return (result2.Result, result2.Result ? result2.Txid : "广播失败！");
+            return (result2.Result, result2.Result ? result2.Txid : "Broadcast failed!");
         }
         /// <summary>
         /// 获取账户资源

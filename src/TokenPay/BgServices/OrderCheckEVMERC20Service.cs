@@ -24,7 +24,7 @@ namespace TokenPay.BgServices
             IHostEnvironment env,
             List<EVMChain> Chains,
             Channel<TokenOrders> channel,
-            IFreeSql freeSql) : base("EVM代币订单检测", TimeSpan.FromSeconds(15), logger)
+            IFreeSql freeSql) : base("EVM token order detection", TimeSpan.FromSeconds(15), logger)
         {
             this._configuration = configuration;
             this._env = env;
@@ -48,7 +48,7 @@ namespace TokenPay.BgServices
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError(e, "{Currency}查询交易记录出错", Currency);
+                        _logger.LogError(e, "{Currency} Error in querying transaction records", Currency);
                     }
                 }
 

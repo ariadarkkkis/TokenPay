@@ -61,17 +61,17 @@ var UseDynamicAddress = Configuration.GetValue("UseDynamicAddress", true);
 var UseDynamicAddressAmountMove = Configuration.GetValue("DynamicAddressConfig:AmountMove", false);
 var CollectionEnable = Configuration.GetValue("Collection:Enable", false);
 Log.Information("-------------{value}-------------", "AppSettings");
-Log.Information("支持的币种: {value}", HomeController.GetActiveCurrency(EVMChains));
-Log.Information("启用动态地址: {value}", UseDynamicAddress);
-Log.Information("启用动态金额: {value}", UseDynamicAddressAmountMove);
-Log.Information("动态金额生效状态: {value}", UseDynamicAddress && UseDynamicAddressAmountMove);
-Log.Information("启用波场自动归集: {value}", CollectionEnable);
+Log.Information("Active currencies: {value}", HomeController.GetActiveCurrency(EVMChains));
+Log.Information("Dynamic address: {value}", UseDynamicAddress);
+Log.Information("Dynamic amount: {value}", UseDynamicAddressAmountMove);
+Log.Information("Dynamic amount effective: {value}", UseDynamicAddress && UseDynamicAddressAmountMove);
+Log.Information("Automatic TRON aggregation: {value}", CollectionEnable);
 if (CollectionEnable)
 {
     var CollectionUseEnergy = Configuration.GetValue("Collection:UseEnergy", true);
     var CollectionForceCheckAllAddress = Configuration.GetValue("Collection:ForceCheckAllAddress", false);
-    Log.Information("启用租用能量: {value}", CollectionUseEnergy);
-    Log.Information("启用强制检查所有地址余额: {value}", CollectionForceCheckAllAddress);
+    Log.Information("Use energy: {value}", CollectionUseEnergy);
+    Log.Information("Force balance check for all addresses: {value}", CollectionForceCheckAllAddress);
 }
 Log.Information("-------------{value}-------------", "End");
 
@@ -139,7 +139,7 @@ Services.AddSingleton(s =>
     }
     catch (Exception e)
     {
-        Log.Logger.Error(e, "机器人连接失败！");
+        Log.Logger.Error(e, "Telegram bot connection failed!");
         throw;
     }
     return bot;
