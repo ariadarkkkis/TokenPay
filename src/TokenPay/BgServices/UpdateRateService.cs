@@ -22,7 +22,7 @@ namespace TokenPay.BgServices
             IConfiguration configuration,
             List<EVMChain> chain,
             IFreeSql freeSql,
-            ILogger<UpdateRateService> logger) : base("更新汇率", TimeSpan.FromSeconds(3600), logger)
+            ILogger<UpdateRateService> logger) : base("更新汇率", TimeSpan.FromSeconds(configuration.GetValue("UpdateRateTime", 300)), logger)
         {
             this._configuration = configuration;
             this._chain = chain;
@@ -73,7 +73,7 @@ namespace TokenPay.BgServices
 
             foreach (var item in baseCurrencyList)
             {
-                var side = "buy";
+                var side = "sell";
                 try
                 {
                     var result = await baseUrl
